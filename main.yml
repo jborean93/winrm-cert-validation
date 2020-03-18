@@ -1,0 +1,62 @@
+---
+- name: setup HTTPS listener with signed certificate
+  hosts: all
+  gather_facts: no
+  tasks:
+  - name: create cert output folder
+    file:
+      path: '{{ playbook_dir }}/cert_setup'
+      state: directory
+    delegate_to: localhost
+
+  - name: create ssl config file
+    template:
+      src: openssl.conf.j2
+      dest: '{{ playbook_dir }}/cert_setup/openssl.conf'
+    delegate_to: localhost
+
+  - name: template test inventory file
+    template:
+      src: inventory.ini.j2
+      dest: '{{ playbook_dir }}/cert_setup/inventory.ini'
+    delegate_to: localhost
+
+  - name: template Docker bootstrap file with host info
+    template:
+      src: bootstrap.sh.j2
+      dest: '{{ playbook_dir }}/cert_setup/bootstrap.sh'
+      mode: 0744
+    delegate_to: localhost
+
+  - name: generate CA and WinRM certificate
+    script: generate_cert.sh {{ inventory_hostname | quote }}
+    args:
+      creates: '{{ playbook_dir }}/cert_setup/cert.pfx'
+      chdir: '{{ playbook_dir }}/cert_setup'
+    delegate_to: localhost
+
+  - name: copy the PFX to the Windows host
+    win_copy:
+      src: '{{ playbook_dir }}/cert_setup/cert.pfx'
+      dest: C:\Windows\TEMP\cert.pfx
+
+  - name: import the WinRM cert to the certificate store
+    win_certificate_store:
+      path: C:\Windows\TEMP\cert.pfx
+      key_exportable: no
+      key_storage: machine
+      password: password
+      state: present
+      store_location: LocalMachine
+      store_name: My
+    register: winrm_cert_info
+
+  - name: change the WinRM certificate thumbprint
+    win_shell: |
+      $selectorSet = @{ Address = '*'; Transport = 'HTTPS' }
+      $valueSet = @{
+        CertificateThumbprint = '{{ winrm_cert_info.thumbprints[0] }}'
+        Enabled = $true
+      }
+      Get-ChildItem -Path WSMan:\localhost\Listener | Where-Object { $_.Keys -contains "Transport=HTTPS" } | Remove-Item -Recurse -Force
+      New-WSManInstance -ResourceURI winrm/config/listener -SelectorSet $selectorSet -ValueSet $valueSet

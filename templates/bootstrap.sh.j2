@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Allow the docker container to connect using the DNS namej
+echo "{{ ansible_host }}  {{ inventory_hostname }}" >> /etc/hosts

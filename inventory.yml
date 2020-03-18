@@ -1,0 +1,12 @@
+all:
+  children:
+    windows:
+      hosts:
+        WINRM-CERT:
+          ansible_host: 192.168.56.50
+          vagrant_box: jborean93/WindowsServer2019
+      vars:
+        ansible_user: vagrant
+        ansible_password: vagrant
+        ansible_connection: psrp
+        ansible_port: 5985
