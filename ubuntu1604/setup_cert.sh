@@ -5,4 +5,4 @@ sed -i 's|%SYSTEM_FILE%|ca-certificates.crt|g' inventory.ini
 
 cp ca.pem /usr/local/share/ca-certificates/ca.crt  # This extension is required
 update-ca-certificates
-# c_rehash  - Python version on Ubuntu 14.04 does not support verifying certs with a dir.
+c_rehash

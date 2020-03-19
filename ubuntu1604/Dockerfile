@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 WORKDIR /root
 
@@ -6,10 +6,15 @@ RUN apt-get update && \
     apt-get install -y \
       python \
       python-pip \
+      python-requests \
       python-virtualenv \
       openssl
+RUN python -m pip install \
+      ansible \
+      pypsrp \
+      pywinrm \
+      cryptography==1.2.3  # Don't break existing pip on the system
 RUN python -m virtualenv ansible-venv && \
-    ansible-venv/bin/python -m pip install -U setuptools pip && \
     ansible-venv/bin/python -m pip install \
       ansible \
       pypsrp \
@@ -17,7 +22,7 @@ RUN python -m virtualenv ansible-venv && \
 COPY cert_setup/ca.pem ca.pem
 COPY cert_setup/inventory.ini inventory.ini
 COPY cert_setup/bootstrap.sh bootstrap.sh
-COPY ubuntu1404/setup_cert.sh setup_cert.sh
+COPY ubuntu1604/setup_cert.sh setup_cert.sh
 RUN ./setup_cert.sh
 
 ENTRYPOINT ["/bin/sh", "-c", "/bin/bash /root/bootstrap.sh && /bin/bash"]

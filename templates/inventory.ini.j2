@@ -1,5 +1,6 @@
 {% for connection, cert_var in [('winrm', 'winrm_ca_trust_path'), ('psrp', 'psrp_ca_cert')] %}
-{% for scenario, path in [('file', '/root/ca.pem'), ('system_file', '/etc/pki/tls/certs/ca-bundle.crt'), ('system_dir', '/etc/pki/tls/certs')] %}
+{{ connection }}  ansible_host={{ inventory_hostname }} ansible_connection={{ connection }}
+{% for scenario, path in [('file', '/root/ca.pem'), ('system_file', '%SYSTEM_DIR%/%SYSTEM_FILE%'), ('system_dir', '%SYSTEM_DIR%')] %}
 {{ connection }}_{{ scenario }}  ansible_host={{ inventory_hostname }} ansible_connection={{ connection }} ansible_{{ cert_var }}={{ path }}
 {% endfor %}
 {% endfor %}

@@ -2,20 +2,28 @@ FROM centos:8
 
 WORKDIR /root
 
-# Ensure Ansible and other pre-reqs are installed
 RUN yum install epel-release -y && \
-    yum install python3 python3-pip openssl openssl-perl -y
-RUN python3 -m pip install ansible pywinrm pypsrp
-
-# Copy the CA cert file to use for trust
+    yum install -y \
+      ansible \
+      python3 \
+      python3-pip \
+      python3-requests \
+      python3-virtualenv \
+      openssl \
+      openssl-perl \
+      which
+RUN sed -i -E 's%#!/usr/bin/python([0-9][0-9]*).([0-9][0-9]*)(.*)%#!/usr/bin/python\1.\2%g' $(which ansible)  # Ansible from yum has the -s flag which means packages installed by pip are ignored (we don't want that)
+RUN python3 -m pip install \
+      pypsrp \
+      pywinrm
+RUN python3 -m virtualenv ansible-venv && \
+    ansible-venv/bin/python -m pip install \
+      ansible \
+      pypsrp \
+      pywinrm
 COPY cert_setup/ca.pem ca.pem
-
-# Copy a test inventory file to test out various permutations
 COPY cert_setup/inventory.ini inventory.ini
-
-# Make sure we can resolve the actual hostname of the cert
 COPY cert_setup/bootstrap.sh bootstrap.sh
-
 COPY centos8/setup_cert.sh setup_cert.sh
 RUN ./setup_cert.sh
 
