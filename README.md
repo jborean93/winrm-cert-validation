@@ -55,7 +55,7 @@ Here is a breakdown of each distro and settings specific to it
 
 | Distro | Staging Path | Sync Command | c_rehash Package | System Trust Dir | System Trust File Bundle |
 | ------ | ------------ | -----------  | ---------------- | ---------------- | ------------------------ |
-| Arch | /etc/ca-certificates/trust-source/anchors | update-ca-trust extract | openssl | /etc/ssl/certs/ca-certificates.crt | /etc/ssl/certs |
+| Arch | /etc/ca-certificates/trust-source/anchors | update-ca-trust extract | openssl | /etc/ssl/certs | /etc/ssl/certs/ca-certificates.crt |
 | Centos | /etc/pki/ca-trust/source/anchors | update-ca-trust extract | openssl-perl | /etc/pki/tls/certs | /etc/pki/tls/certs/ca-bundle.crt⁰ |
 | Fedora | /etc/pki/ca-trust/source/anchors | update-ca-trust extract | openssl-perl | /etc/pki/tls/certs | /etc/pki/tls/certs/ca-bundle.crt |
 | openSUSE Leap | /etc/pki/trust/anchors | update-ca-certificates | openssl | /etc/ssl/certs | /etc/ssl/ca-bundle.pem |
