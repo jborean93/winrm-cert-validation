@@ -15,7 +15,8 @@ a distro specific package like `yum install python-requests` are configured to u
 the cert trust location for WinRM in Ansible changes based on a myriad of reasons which just confuse anyone trying to
 get HTTPS cert validation done in the correct way.
 
-_TODO: Investigate requests.utils.DEFAULT_CA_BUNDLE_PATH._
+If you want to know where requests is looking for the CA bundle you can run
+`python -c "import requests.utils; print(requests.utils.DEFAULT_CA_BUNDLE_PATH)"`.
 
 All is not lost and I've created this repo to try and navigate through the various distro specific options and paths to
 create a detailed guide on how to get cert verification happening for WinRM in Ansible. There are a few levers you can
@@ -54,12 +55,15 @@ Here is a breakdown of each distro and settings specific to it
 
 | Distro | Staging Path | Sync Command | c_rehash Package | System Trust Dir | System Trust File Bundle |
 | ------ | ------------ | -----------  | ---------------- | ---------------- | ------------------------ |
+| Arch | /etc/ca-certificates/trust-source/anchors | update-ca-trust extract | openssl | /etc/ssl/certs/ca-certificates.crt | /etc/ssl/certs |
 | Centos | /etc/pki/ca-trust/source/anchors | update-ca-trust extract | openssl-perl | /etc/pki/tls/certs | /etc/pki/tls/certs/ca-bundle.crt⁰ |
+| Fedora | /etc/pki/ca-trust/source/anchors | update-ca-trust extract | openssl-perl | /etc/pki/tls/certs | /etc/pki/tls/certs/ca-bundle.crt |
+| openSUSE Leap | /etc/pki/trust/anchors | update-ca-certificates | openssl | /etc/ssl/certs | /etc/ssl/ca-bundle.pem |
 | Ubuntu | /usr/local/share/ca-certificates¹ | update-ca-certificates | openssl | /etc/ssl/certs² | /etc/ssl/certs/ca-certificates.crt |
 
-*0* - The requests version installed by `yum install python-requests` on Centos 7 does not support dirs as a trust path. This is not a limitation when installed through pip or on Centos 8
-*1* - Copied file must have the extension `.crt` but can be a PEM encoded cert
-*2* - The Python version included with Ubuntu 14.04 does not support dirs as a trust path
+`⁰` - The requests version installed by `yum install python-requests` on Centos 7 does not support dirs as a trust path. This is not a limitation when installed through pip or on Centos 8
+`¹` - Copied file must have the extension `.crt` but can be a PEM encoded cert
+`²` - The Python version included with Ubuntu 14.04 does not support dirs as a trust path
 
 
 ## Requirements
@@ -75,8 +79,12 @@ To set up the Windows host and CA certificates run `vagrant up`.
 
 To set up the test container for each distro run
 
+* `docker build -f archlinux/Dockerfile .`
 * `docker build -f centos7/Dockerfile .`
 * `docker build -f centos8/Dockerfile .`
+* `docker build -f fedora30/Dockerfile .`
+* `docker build -f fedora31/Dockerfile .`
+* `docker build -f opensuse15.2/Dockerfile .`
 * `docker build -f ubuntu1404/Dockerfile .`
 * `docker build -f ubuntu1604/Dockerfile .`
 * `docker build -f ubuntu1804/Dockerfile .`

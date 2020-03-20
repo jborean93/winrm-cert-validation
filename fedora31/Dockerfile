@@ -1,9 +1,8 @@
-FROM centos:8
+FROM fedora:31
 
 WORKDIR /root
 
-RUN yum install epel-release -y && \
-    yum install -y \
+RUN dnf install -y \
       ansible \
       openssl \
       openssl-perl \
@@ -11,11 +10,11 @@ RUN yum install epel-release -y && \
       python3-pip \
       python3-requests \
       python3-virtualenv \
+      python3-winrm \
       which
-RUN sed -i -E 's%#!/usr/bin/python([0-9][0-9]*).([0-9][0-9]*)(.*)%#!/usr/bin/python\1.\2%g' $(which ansible)  # Ansible from yum has the -s flag which means packages installed by pip are ignored (we don't want that)
+RUN sed -i -E 's%#!/usr/bin/python([0-9][0-9]*)(.*)%#!/usr/bin/python\1%g' $(which ansible)  # Ansible from dnf has the -s flag which means packages installed by pip are ignored (we don't want that)
 RUN python3 -m pip install \
-      pypsrp \
-      pywinrm
+      pypsrp
 RUN python3 -m virtualenv ansible-venv && \
     ansible-venv/bin/python -m pip install \
       ansible \

@@ -1,19 +1,19 @@
-FROM ubuntu:18.04
+FROM archlinux:latest
 
 WORKDIR /root
 
-RUN apt-get update && \
-    apt-get install -y \
-      openssl \
-      python3 \
-      python3-pip \
-      python3-requests \
-      python3-virtualenv
-RUN python3 -m pip install \
+RUN pacman -Sy --noconfirm \
       ansible \
-      pypsrp \
-      pywinrm
-RUN python3 -m virtualenv ansible-venv --python=python3 && \
+      ca-certificates-utils \
+      openssl \
+      python \
+      python-pip \
+      python-pywinrm \
+      python-requests \
+      python-virtualenv
+RUN python -m pip install \
+      pypsrp
+RUN python -m virtualenv ansible-venv && \
     ansible-venv/bin/python -m pip install \
       ansible \
       pypsrp \
@@ -21,7 +21,7 @@ RUN python3 -m virtualenv ansible-venv --python=python3 && \
 COPY cert_setup/ca.pem ca.pem
 COPY cert_setup/inventory.ini inventory.ini
 COPY cert_setup/bootstrap.sh bootstrap.sh
-COPY ubuntu1804/setup_cert.sh setup_cert.sh
+COPY archlinux/setup_cert.sh setup_cert.sh
 RUN ./setup_cert.sh
 
 ENTRYPOINT ["/bin/sh", "-c", "/bin/bash /root/bootstrap.sh && /bin/bash"]

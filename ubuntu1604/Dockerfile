@@ -4,11 +4,11 @@ WORKDIR /root
 
 RUN apt-get update && \
     apt-get install -y \
+      openssl \
       python \
       python-pip \
       python-requests \
-      python-virtualenv \
-      openssl
+      python-virtualenv
 RUN python -m pip install \
       ansible \
       pypsrp \

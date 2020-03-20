@@ -5,12 +5,12 @@ WORKDIR /root
 RUN yum install epel-release -y && \
     yum install -y \
       ansible \
+      openssl \
+      openssl-perl \
       python \
       python-pip \
       python-virtualenv \
-      python-winrm \
-      openssl \
-      openssl-perl  # Add c_rehash
+      python-winrm
 RUN python -m pip install --no-deps pypsrp && pip install -U ntlm-auth  # Need to be selective here to avoid requests being reinstalled with a newer version from pip
 RUN python -m virtualenv ansible-venv && \
     ansible-venv/bin/python -m pip install \
