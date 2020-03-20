@@ -62,7 +62,9 @@ Here is a breakdown of each distro and settings specific to it
 | Ubuntu | /usr/local/share/ca-certificates¹ | update-ca-certificates | openssl | /etc/ssl/certs² | /etc/ssl/certs/ca-certificates.crt |
 
 `⁰` - The requests version installed by `yum install python-requests` on Centos 7 does not support dirs as a trust path. This is not a limitation when installed through pip or on Centos 8
+
 `¹` - Copied file must have the extension `.crt` but can be a PEM encoded cert
+
 `²` - The Python version included with Ubuntu 14.04 does not support dirs as a trust path
 
 
